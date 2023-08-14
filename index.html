@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>JSON key's Path finder</title>
+</head>
+<style type="text/css">
+*{
+	background-color: black;
+	color:white;
+
+}
+
+body{
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+div{
+	color: red;
+	font-size: 20px;
+}
+input,textarea{
+	font-size: 20px;
+}
+button{
+	margin-top: 5px;
+}
+</style>
+<body>
+	<h1>Key's Path finder</h1>
+	<textarea id = 'jsonInput' style="resize: none; width: 600px;height:400px;"></textarea>
+	<br/>
+	<input type="text" name="keyVal" id ="keyVal" placeholder="key to find" style="height: 35px;">
+	<button onclick="ans()" style="height:35px; font-size: 20px;">find</button>
+	<div id = 'results'></div>
+</body>
+<script>
+const results = document.getElementById('results')
+let found = false;
+function pathFinder(root,key,psf){
+	if(typeof(root) !== 'object')
+	 	return
+	
+	for(let i in root){
+		if(root[i]==key){ // stritch checking removed
+			psf.push(i);
+			found = true;
+			injectAns(psf);
+			return;
+		}
+	}
+
+
+	for(let i in root){
+		psf.push(i);
+		pathFinder(root[i],key,psf);
+		psf.pop();
+	}
+
+
+}
+
+function ans(){
+	//console.log('calling ans')
+	found = false;
+	const root = document.getElementById('jsonInput').value;
+	const key = document.getElementById('keyVal').value;
+	try{
+	const jsonData = JSON.parse(root);
+	// console.log('done with parsing')
+	const psf = [];
+	pathFinder(jsonData,key,psf)
+	if(!found){
+		results.style.color = "purple"
+		results.innerText = 'Input not found'
+		return;
+	}
+	}
+	catch(err){
+		console.log(err)
+		injectAns('err')
+
+	}
+}
+
+function injectAns(path){
+	
+	// console.log(path)
+	if(path === 'err'){
+		results.style.color = "red"
+		results.innerText = 'Wrong Input'
+		return;
+	}
+	//const key = document.getElementById('key').value;
+	let result = '';
+	for(let i = 0 ; i<path.length ; i++)
+		if(isFinite(Number(path[i]))){
+				result = result.slice(0,-1)
+			result = result + `[${path[i]}].`
+		}
+		else
+		result = result +  path[i] + '.';
+
+	result = result.slice(0,-1)
+	results.style.color = "green"
+	if(result == ''){
+		results.innerText = "Value not found!"
+		return;
+	}
+	results.innerText= result;
+
+}
+
+
+</script>
+</html>
